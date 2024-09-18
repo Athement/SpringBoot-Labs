@@ -5,6 +5,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,6 +32,8 @@ public class ShiroConfig {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         // 设置其使用的 Realm
         securityManager.setRealm(this.realm());
+        //自定义web session管理器,默认session为容器管理
+        securityManager.setSessionManager(new DefaultWebSessionManager());
         return securityManager;
     }
 
