@@ -1,5 +1,6 @@
 package cn.iocoder.springboot.lab01.shirodemo.config;
 
+import cn.iocoder.springboot.lab01.shirodemo.filter.TestFilter01;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -7,6 +8,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,29 +38,33 @@ public class ShiroConfig {
     public ShiroFilterFactoryBean shiroFilterFactoryBean() {
         // 创建 ShiroFilterFactoryBean 对象，用于创建 ShiroFilter 过滤器
         ShiroFilterFactoryBean filterFactoryBean = new ShiroFilterFactoryBean();
-
         // 设置 SecurityManager
         filterFactoryBean.setSecurityManager(this.securityManager());
-
         // 设置 URL 们
         filterFactoryBean.setLoginUrl("/login"); // 登陆 URL
         filterFactoryBean.setSuccessUrl("/login_success"); // 登陆成功 URL
         filterFactoryBean.setUnauthorizedUrl("/unauthorized"); // 无权限 URL
-
+        // 设置过滤器
+        filterFactoryBean.setFilters(filterMap());
         // 设置 URL 的权限配置
-        filterFactoryBean.setFilterChainDefinitionMap(this.filterChainDefinitionMap());
-
+        filterFactoryBean.setFilterChainDefinitionMap(this.filterChainMap());
         return filterFactoryBean;
     }
-
-    private Map<String, String> filterChainDefinitionMap() {
-        Map<String, String> filterMap = new LinkedHashMap<>(); // 注意要使用有序的 LinkedHashMap ，顺序匹配
-        filterMap.put("/test/echo", "anon"); // 允许匿名访问
-        filterMap.put("/test/admin", "roles[ADMIN]"); // 需要 ADMIN 角色
-        filterMap.put("/test/normal", "roles[NORMAL]"); // 需要 NORMAL 角色
-        filterMap.put("/logout", "logout"); // 退出
-        filterMap.put("/**", "authc"); // 默认剩余的 URL ，需要经过认证
+    //过滤器配置
+    private Map<String, Filter> filterMap() {
+        Map<String, Filter> filterMap = new LinkedHashMap<>(); // 注意要使用有序的 LinkedHashMap ，顺序匹配
+        filterMap.put("testFilter01", new TestFilter01()); // 添加自定义过滤器
         return filterMap;
+    }
+    //url过滤器链配置
+    private Map<String, String> filterChainMap() {
+        Map<String, String> filterChainMap = new LinkedHashMap<>(); // 注意要使用有序的 LinkedHashMap ，顺序匹配
+        filterChainMap.put("/test/echo", "anon"); // 允许匿名访问
+        filterChainMap.put("/test/normal", "roles[NORMAL]"); // 需要 NORMAL 角色
+        filterChainMap.put("/test/admin", "testFilter01,roles[NORMAL]"); // 需要 ADMIN 角色
+        filterChainMap.put("/logout", "logout"); // 退出
+        filterChainMap.put("/**", "authc"); // 默认剩余的 URL ，需要经过认证
+        return filterChainMap;
     }
 
 }
