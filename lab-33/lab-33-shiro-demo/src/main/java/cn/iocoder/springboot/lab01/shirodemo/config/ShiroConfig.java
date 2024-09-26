@@ -64,7 +64,7 @@ public class ShiroConfig {
         Map<String, String> filterChainMap = new LinkedHashMap<>(); // 注意要使用有序的 LinkedHashMap ，顺序匹配
         filterChainMap.put("/test/echo", "anon"); // 允许匿名访问
         filterChainMap.put("/test/normal", "roles[NORMAL]"); // 需要 NORMAL 角色
-        filterChainMap.put("/test/admin", "testFilter01,roles[NORMAL]"); // 需要 ADMIN 角色
+        filterChainMap.put("/test/admin", "testFilter01,roles[ADMIN]"); // 需要 ADMIN 角色
         filterChainMap.put("/logout", "logout"); // 退出
         filterChainMap.put("/**", "authc"); // 默认剩余的 URL ，需要经过认证
         return filterChainMap;
